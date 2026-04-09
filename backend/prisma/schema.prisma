@@ -1,0 +1,93 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  PATIENT
+  DOCTOR
+  ADMIN
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  role         UserRole @default(PATIENT)
+  fullName     String?
+  doctorProfile DoctorProfile?
+  patientProfile PatientProfile?
+  refreshTokens RefreshToken[]
+  doctorAppointments Appointment[] @relation("DoctorAppointments")
+  patientAppointments Appointment[] @relation("PatientAppointments")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model RefreshToken {
+  id          String   @id @default(cuid())
+  tokenHash   String   @unique
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt   DateTime
+  revokedAt   DateTime?
+  replacedById String?
+  userAgent   String?
+  ipAddress   String?
+  createdAt   DateTime @default(now())
+
+  @@index([userId, revokedAt])
+  @@index([expiresAt])
+}
+
+model DoctorProfile {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  specialization String
+  experienceYears Int?
+  consultationFee Decimal? @db.Decimal(10, 2)
+  isAvailable    Boolean  @default(true)
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model PatientProfile {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  dateOfBirth  DateTime?
+  gender       String?
+  bloodGroup   String?
+  phoneNumber  String?
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Appointment {
+  id                String            @id @default(cuid())
+  doctorId          String
+  patientId         String
+  appointmentAt     DateTime
+  reason            String?
+  notes             String?
+  status            AppointmentStatus @default(PENDING)
+  doctor            User              @relation("DoctorAppointments", fields: [doctorId], references: [id], onDelete: Restrict)
+  patient           User              @relation("PatientAppointments", fields: [patientId], references: [id], onDelete: Restrict)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  @@index([doctorId, appointmentAt])
+  @@index([patientId, appointmentAt])
+}
