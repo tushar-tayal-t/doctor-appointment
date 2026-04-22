@@ -19,6 +19,7 @@ type TokenPayload = {
   accessToken: string;
   refreshToken: string;
   refreshTokenExpiresInMs: number;
+  accessTokenExpiresInMs: number;
 };
 
 type AuthResponse = {
@@ -88,6 +89,7 @@ const issueTokenPair = async (
   });
 
   const refreshTokenExpiresInMs = parseDurationToMs(env.JWT_REFRESH_EXPIRES_IN);
+  const accessTokenExpiresInMs = parseDurationToMs(env.JWT_ACCESS_EXPIRES_IN);
   const expiresAt = new Date(Date.now() + refreshTokenExpiresInMs);
   const refreshTokenHash = hashToken(refreshToken);
 
@@ -117,7 +119,8 @@ const issueTokenPair = async (
   return {
     accessToken: signAccessToken(user),
     refreshToken,
-    refreshTokenExpiresInMs
+    refreshTokenExpiresInMs,
+    accessTokenExpiresInMs,
   };
 };
 

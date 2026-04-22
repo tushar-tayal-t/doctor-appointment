@@ -32,8 +32,27 @@ src/
 - `GET /api/v1/health` - Health check
 - `POST /api/v1/auth/register` - Register user with role (`PATIENT`, `DOCTOR`, `ADMIN`)
 - `POST /api/v1/auth/login` - Authenticate user
-- `GET /api/v1/appointments` - Fetch appointments
-- `POST /api/v1/appointments` - Create appointment
+- `GET /api/v1/appointments` - Fetch appointments (authenticated; scoped by role)
+- `POST /api/v1/appointments` - Create appointment (authenticated; `PATIENT` and `ADMIN`)
+
+## Required Environment Variables
+
+- `DATABASE_URL`
+- `JWT_SECRET`
+- `JWT_REFRESH_SECRET`
+
+## Optional Environment Variables
+
+- `PORT` (default: `5000`)
+- `NODE_ENV` (`development`, `test`, `production`)
+- `APP_NAME` (default: `doctor-appointment-backend`)
+- `LOG_LEVEL` (default: `info`)
+- `CORS_ORIGIN` (default: `*`)
+- `TRUST_PROXY` (default: `1`)
+- `SHUTDOWN_TIMEOUT_MS` (default: `10000`)
+- `JWT_EXPIRES_IN` (default: `15m`)
+- `JWT_REFRESH_EXPIRES_IN` (default: `7d`)
+- `JWT_REFRESH_COOKIE_NAME` (default: `refreshToken`)
 
 ## Quick Start
 

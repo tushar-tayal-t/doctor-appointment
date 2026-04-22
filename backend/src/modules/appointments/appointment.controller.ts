@@ -10,7 +10,7 @@ export const createAppointment = async (
 ): Promise<void> => {
   try {
     const data = req.body as CreateAppointmentInput;
-    const result = await appointmentService.createAppointment(data);
+    const result = await appointmentService.createAppointment(data, req.user!);
 
     res.status(StatusCodes.CREATED).json({
       success: true,
@@ -24,7 +24,7 @@ export const createAppointment = async (
 
 export const getAppointments = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const result = await appointmentService.listAppointments();
+    const result = await appointmentService.listAppointments(_req.user!);
 
     res.status(StatusCodes.OK).json({
       success: true,

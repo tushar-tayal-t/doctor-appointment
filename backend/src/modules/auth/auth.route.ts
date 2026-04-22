@@ -9,7 +9,7 @@ const authRouter = Router();
 authRouter.post("/register", validateBody(registerSchema), register);
 authRouter.post("/login", validateBody(loginSchema), login);
 authRouter.post("/refresh", refresh);
-authRouter.post("/logout", logout);
+authRouter.post("/logout",requireAuth, logout);
 authRouter.post("/logout-all", requireAuth, logoutAll);
 authRouter.get("/me", requireAuth, me);
 

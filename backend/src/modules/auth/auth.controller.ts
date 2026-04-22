@@ -5,7 +5,7 @@ import type { LoginInput, RegisterInput } from "./auth.validation.js";
 import { env } from "../../config/env.js";
 import { AppError } from "../../common/errors/app.error.js";
 
-const refreshCookiePath = "/api/v1/auth";
+const refreshCookiePath = "/";
 
 const parseCookie = (req: Request, cookieName: string): string | null => {
   const cookieHeader = req.headers.cookie;
@@ -27,7 +27,7 @@ const parseCookie = (req: Request, cookieName: string): string | null => {
 const buildRefreshCookieOptions = (maxAge?: number) => ({
   httpOnly: true,
   secure: env.NODE_ENV === "production",
-  sameSite: "strict" as const,
+  sameSite: "none" as const,
   path: refreshCookiePath,
   maxAge
 });
@@ -43,12 +43,16 @@ const sendAuthSuccess = (
     payload.refreshToken,
     buildRefreshCookieOptions(payload.refreshTokenExpiresInMs)
   );
+  res.cookie(
+    env.JWT_ACCESS_COOKIE_NAME,
+    payload.accessToken,
+    buildRefreshCookieOptions(payload.accessTokenExpiresInMs)
+  );
 
   res.status(statusCode).json({
     success: true,
     message,
     data: {
-      accessToken: payload.accessToken,
       user: payload.user
     }
   });
@@ -70,6 +74,7 @@ export const register = async (req: Request, res: Response, next: NextFunction):
 export const login = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const data = req.body as LoginInput;
+    console.log("helo");
     const result = await authService.login(data, {
       userAgent: req.headers["user-agent"],
       ipAddress: req.ip

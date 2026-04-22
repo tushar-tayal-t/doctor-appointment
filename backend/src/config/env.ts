@@ -9,12 +9,16 @@ const envSchema = z.object({
   APP_NAME: z.string().default("doctor-appointment-backend"),
   LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace"]).default("info"),
   CORS_ORIGIN: z.string().default("*"),
+  TRUST_PROXY: z.coerce.number().int().min(0).default(1),
+  SHUTDOWN_TIMEOUT_MS: z.coerce.number().int().positive().default(10000),
   DATABASE_URL: z.url(),
   JWT_SECRET: z.string(),
   JWT_EXPIRES_IN: z.string().default("15m"),
   JWT_REFRESH_SECRET: z.string(),
   JWT_REFRESH_EXPIRES_IN: z.string().default("7d"),
-  JWT_REFRESH_COOKIE_NAME: z.string().default("refreshToken")
+  JWT_REFRESH_COOKIE_NAME: z.string().default("refreshToken"),
+  JWT_ACCESS_COOKIE_NAME: z.string().default("accessToken"),
+  JWT_ACCESS_EXPIRES_IN: z.string().default("15M"),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);
